@@ -1,0 +1,119 @@
+{% if displaycomments %}
+<!-- ********** -->
+<!-- Thumbnails Bar part of -->
+<!-- {{p.name|commentsafe}} -->
+<!-- id : {{p.id}} -->
+<!-- ********** -->
+{% endif %}
+
+{% comment %}<!-- Note : for boolean values, use 0 for false and 1 for true -->{% endcomment %}
+
+{% with "bottomleft" as tbPositionString %}
+{% with "horizontal" as tbOrientationString %}
+{% with 1 as tbAlignedOnBottom %}
+{% with 0 as tbAlignedOnRight %}
+{% with 0 as tbAlignedOnTop %}
+{% with 1 as tbAlignedOnLeft %}
+
+{% with p.hideonhidecontrols.value as tbHideOnHideControls %}
+{% with 10 as tbMarginX %}
+{% with 0 as tbMarginY %}
+{% with p.tooltips.value as tbPanoramaTooltip %}
+{% with p.source.mode as tbSourceMode %}
+{% with 0 as tbAdjustedToContent %}
+
+{% with 1 as scrollButtonsUseCrop %}
+{% with p.buttonbg.value as scrollButtonsUseBg %}
+{% with button_width as scrollButtonsWidth %}
+{% with custom_tooltip_style_name as tbTooltipStyle %}
+
+<layer name="thumbnailsBar{{ tbPlugName }}"
+	keep="true"
+	type="container"
+	visible="false"
+	parent="{{plugname}}_bg"
+	align="{{ tbPositionString }}"
+
+	width="100%"
+	height="30"
+
+	x="0"
+	y="0"
+	zorder="7000"
+/>
+
+{% if scrollButtonsUseBg %}
+	{%comment%}<!-- SCROLL ARROWS BACKGROUND -->{%endcomment%}
+	<style name="scrollButtonsBgStyle{{ tbPlugName }}"
+		keep="true"
+		parent="thumbnailsBar{{ tbPlugName }}"
+		alpha="0.3"
+		zorder="1"
+	/>
+	<layer name="scrollPrevArrowBg{{ tbPlugName }}"
+		style="scrollButtonsBgStyle{{ tbPlugName }}"
+		url="%FIRSTXML%/{{pluginDirectory}}/btn_scroll_left_bg.png"
+		visible="false"
+		{% ifequal tbOrientationString "vertical" %}
+			align="top"
+		{% else %}
+			align="left"
+		{% endifequal %}
+	/>
+	<layer name="scrollNextArrowBg{{ tbPlugName }}"
+		style="scrollButtonsBgStyle{{ tbPlugName }}"
+		url="%FIRSTXML%/{{pluginDirectory}}/btn_scroll_right_bg.png"
+		visible="false"
+		{% ifequal tbOrientationString "vertical" %}
+			align="bottom"
+		{% else %}
+			align="right"
+		{% endifequal %}
+	/>
+{% endif %}
+
+{% include 'thumbnailsBarCore.tmpl' %}
+
+{% comment %}
+<!--
+@desc Resize method for thumbnailsBar from theme01 width calculation
+@param {Int} %1 new width
+-->
+{% endcomment %}
+<action name="resetThumbnailsBarSize{{ tbPlugName }}">
+
+	{% comment %}<!-- calculate thumb height + margins + offsets -->{%endcomment%}
+	set(sizeHeight, {{ tbThumbHeight }});
+	mul(totalMarginY, {{ tbMarginY }}, 2);
+	if(layer[thumbnailBorderSource{{ tbPlugName }}].url,
+		mul(totalOffsetY, get(layer[thumbnailBorderSource{{ tbPlugName }}].offsetY), 2);
+	,
+		mul(totalOffsetY, get(layer[thumbnailBorderSource{{ tbPlugName }}].borderWidth), 2);
+	);
+	add(sizeHeight, totalMarginY);
+	add(sizeHeight, totalOffsetY);
+
+	setSize{{ tbPlugName }}(%1, sizeHeight);
+</action>
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}

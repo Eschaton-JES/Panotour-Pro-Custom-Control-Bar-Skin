@@ -1,0 +1,2084 @@
+{% if displaycomments %}
+<!-- ********** -->
+<!-- {{p.name|commentsafe}} -->
+<!-- id : {{p.id}} -->
+<!-- ********** -->
+{% endif %}
+
+{% with p.id as plugname %}
+{% with 36 as button_width %}
+{% with 48 as icon_width %}
+{% with "_"|add:p.id as tbPlugName %}
+{% with p.thumbWidth.value as tbThumbWidth %}
+{% with 40 as tbThumbHeight %}
+{% set plugname|add:"menuTooltipStyle" as custom_tooltip_style_name %}
+{% set "true" as custom_tooltip_style %}
+{% if p.custom_tooltips %}
+{% if not p.custom_tooltips.value %}
+{% set "false" as custom_tooltip_style %}
+{% set '' as custom_tooltip_style_name %}
+{% endif %}
+{% endif %}
+<krpano {{plugname}}barbuilt="false" {{plugname}}IsOpened="false"{%if p.displaythumbnails.value %}{% ifnotequal project.panoramas.count 1%} {{plugname}}ThumbnailsPos="0"{%endifnotequal%}{%endif%} />
+
+<events name="{{plugname}}barevents"
+	onxmlcomplete="{{plugname}}buildMenuBar();"
+
+{% if p.hide_on_video_playback.value %}
+	openvideointerface="{{plugname}}HideControlBar();"
+	closevideointerface="{{plugname}}ShowControlBar();"
+{% else %}
+{% if p.videoplaypause.enabled %}
+	openvideointerface="{{plugname}}OpenVideoplayer();"
+	closevideointerface="{{plugname}}CloseVideoplayer();"
+{% endif %}
+{% endif %}
+
+	{%if p.displaythumbnails.value %}{% ifnotequal project.panoramas.count 1%}onresize="{{plugname}}OnResize();"{%endifnotequal%}{%endif%}
+	keep="true"/>
+
+
+{% if p.hide_on_video_playback.value %}
+<action name="{{plugname}}HideControlBar">
+	if({{plugname}}IsOpened,
+		set(layer[{{plugname}}_bg].visible, false);
+	,
+		set(layer[{{plugname}}btn_showcontrols].visible, false);
+	);
+</action>
+<action name="{{plugname}}ShowControlBar">
+	if({{plugname}}IsOpened,
+		set(layer[{{plugname}}_bg].visible, true);
+	,
+		set(layer[{{plugname}}btn_showcontrols].visible, true);
+	);
+</action>
+{% endif %}
+
+<action name="{{plugname}}buildMenuBar">
+	ifnot ({{plugname}}barbuilt, {{plugname}}buildMenu(); set({{plugname}}barbuilt, true););
+</action>
+
+{% comment %}<!-- Internal Thumbnails -->{% endcomment %}
+{% if p.displaythumbnails.value %}
+	{% ifnotequal project.panoramas.count 1%}
+		{% include "thumbnailsBar.tmpl" %}
+	{% endifnotequal %}
+{% endif %}
+
+<action name="{{plugname}}buildMenu">
+	{% with 0  as button_margin %}
+	{% with button_width|add:button_margin as button_offset %}
+
+    set({{plugname}}button_pos, 0);
+{% if p.hidecontrols.enabled %}
+    set(layer[{{plugname}}btn_hidecontrols].x, get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+    set(layer[{{plugname}}btn_hidecontrols_bg].x, get({{plugname}}button_pos));
+{% endif %}
+    inc({{plugname}}button_pos, {{button_offset}});
+{%endif%}
+
+{% if p.displayinfo.enabled %}
+      set(layer[{{plugname}}btn_display_info].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_display_info_bg].x, get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_close_info].x  , get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_close_info_bg].x  , get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{% endif %}
+
+{% if p.displayhelp.enabled %}
+      if (device.desktop,
+        set(layer[{{plugname}}btn_display_help].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_display_help_bg].x, get({{plugname}}button_pos));{% endif %}
+        set(layer[{{plugname}}btn_close_help].x  , get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_close_help_bg].x  , get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{% endif %}
+{% if p.fullscreen.enabled %}
+      if (device.fullscreensupport,
+        set(layer[{{plugname}}btn_openfs].x, get({{plugname}}button_pos));
+        set(layer[{{plugname}}btn_closefs].x, get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+        set(layer[{{plugname}}btn_openfs_bg ].x, get({{plugname}}button_pos));
+        set(layer[{{plugname}}btn_closefs_bg].x, get({{plugname}}button_pos));
+{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{% endif %}
+
+{% if p.share.enabled %}
+      set(layer[{{plugname}}btn_share].x   , get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+      set(layer[{{plugname}}btn_share_bg].x, get({{plugname}}button_pos));
+{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{% endif %}
+{% if p.displaymap.enabled %}
+      set(layer[{{plugname}}btn_display_map].x   , get({{plugname}}button_pos));
+      set(layer[{{plugname}}btn_hide_map].x   , get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+      set(layer[{{plugname}}btn_display_map_bg].x, get({{plugname}}button_pos));
+      set(layer[{{plugname}}btn_hide_map_bg].x, get({{plugname}}button_pos));
+{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{%endif%}
+{% if p.displayfloorplan.enabled %}
+      set(layer[{{plugname}}btn_display_floorplan].x, get({{plugname}}button_pos));
+      set(layer[{{plugname}}btn_hide_floorplan].x, get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+      set(layer[{{plugname}}btn_display_floorplan_bg].x, get({{plugname}}button_pos));
+      set(layer[{{plugname}}btn_hide_floorplan_bg].x, get({{plugname}}button_pos));
+{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{%endif%}
+
+{% if p.autorotation.enabled %}
+      set(layer[{{plugname}}btn_autorotate_on].x , get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_autorotate_on_bg].x , get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_autorotate_off].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_autorotate_off_bg].x, get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{%endif%}
+
+{% if p.autotour.enabled %}
+      set(layer[{{plugname}}btn_autotour_on].x , get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_autotour_on_bg].x , get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_autotour_off].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_autotour_off_bg].x, get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{%endif%}
+{% if p.sounds.enabled %}
+      set(layer[{{plugname}}btn_sound_on].x , get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_sound_on_bg].x , get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_sound_off].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_sound_off_bg].x, get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{%endif%}
+
+{% if p.hidethumbnails.enabled %}
+{% ifnotequal project.panoramas.count 1 %}
+      set(layer[{{plugname}}btn_show_thumbnails].x , get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_show_thumbnails_bg].x , get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_hide_thumbnails].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_hide_thumbnails_bg].x, get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{% endifnotequal %}
+{%endif%}
+{% if p.mousecontrol.enabled %}
+      if (device.desktop,
+        set(layer[{{plugname}}btn_ctrlmode_drag_to].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_ctrlmode_drag_to_bg].x, get({{plugname}}button_pos));{% endif %}
+        set(layer[{{plugname}}btn_ctrlmode_move_to].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_ctrlmode_move_to_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{%endif%}
+
+{% if p.enterVR.enabled %}
+      if(plugin[ptpvrmode] AND device.html5{% if p.mobile_only %}{% if p.mobile_only.value %} AND device.mobile{% endif %}{% endif %},
+        set(layer[{{plugname}}btn_enter_vr].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg].x, get({{plugname}}button_pos));{% endif %}
+        set(layer[{{plugname}}btn_enter_vr_not].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg_not].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+{%endif%}
+
+{% if p.hidespots.enabled %}
+      set(layer[{{plugname}}btn_show_hotspots].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_show_hotspots_bg].x, get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_hide_hotspots].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_hide_hotspots_bg].x, get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{%endif%}
+
+{% if p.gyro.enabled %}
+      if(plugin[gyroscope],
+        set({{plugname}}DisplayGyroscopeButton, false);
+        if (device.tablet, set({{plugname}}DisplayGyroscopeButton, true););
+        if (device.mobile, set({{plugname}}DisplayGyroscopeButton, true););
+        if({{plugname}}DisplayGyroscopeButton,
+          set(layer[{{plugname}}btn_gyroscope_on].x, get({{plugname}}button_pos));
+          {%if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_on_bg ].x, get({{plugname}}button_pos));{% endif %}
+          set(layer[{{plugname}}btn_gyroscope_off].x, get({{plugname}}button_pos));
+          {%if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_off_bg].x, get({{plugname}}button_pos));{% endif %}
+          set(layer[{{plugname}}btn_gyroscope_not].x, get({{plugname}}button_pos));
+          {%if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_not_bg].x, get({{plugname}}button_pos));{% endif %}
+          inc({{plugname}}button_pos, {{button_offset}});
+        );
+      );
+
+{%endif%}
+
+{% if p.home.enabled %}
+      set(layer[{{plugname}}btn_home].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_home_bg].x, get({{plugname}}button_pos));{% endif %}
+      inc({{plugname}}button_pos, {{button_offset}});
+
+{% endif %}
+{% if p.horizontalnavigation.enabled %}
+      if (device.desktop,
+        set(layer[{{plugname}}btn_right].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_right_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+
+        set(layer[{{plugname}}btn_left].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_left_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{% endif %}
+{% if p.verticalnavigation.enabled %}
+      if (device.desktop,
+        set(layer[{{plugname}}btn_down].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_down_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+
+        set(layer[{{plugname}}btn_up].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_up_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{% endif %}
+{% if p.zoom.enabled %}
+      if (device.desktop,
+        set(layer[{{plugname}}btn_out].x, get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+        set(layer[{{plugname}}btn_out_bg].x, get({{plugname}}button_pos));
+{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+        set(layer[{{plugname}}btn_in].x, get({{plugname}}button_pos));
+{%if p.buttonbg.value %}
+        set(layer[{{plugname}}btn_in_bg].x, get({{plugname}}button_pos));
+{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{%endif%}
+
+{% if p.prevnext.enabled %}
+      if (scene.count GT 1,
+        set(layer[{{plugname}}btn_next_pano].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_next_pano_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+
+        set(layer[{{plugname}}btn_prev_pano].x, get({{plugname}}button_pos));
+        {%if p.buttonbg.value %}set(layer[{{plugname}}btn_prev_pano_bg].x, get({{plugname}}button_pos));{% endif %}
+        inc({{plugname}}button_pos, {{button_offset}});
+      );
+
+{% endif %}
+
+{% if p.videoplaypause.enabled %}
+      set(layer[{{plugname}}btn_play_video].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_play_video_bg].x, get({{plugname}}button_pos));{% endif %}
+      set(layer[{{plugname}}btn_pause_video].x, get({{plugname}}button_pos));
+      {%if p.buttonbg.value %}set(layer[{{plugname}}btn_pause_video_bg].x, get({{plugname}}button_pos));{% endif %}
+{% endif %}
+
+
+	{% comment %}<!-- if project.hideControlsDuringIntroduction, wait for onTourStart event -->{% endcomment %}
+	{% if not project.hideControlsDuringIntroduction %}
+	{{plugname}}CallOnStartTour();
+	{% endif %}
+
+	{% endwith %}
+	{% endwith %}
+</action>
+
+{% if project.hideControlsDuringIntroduction %}
+<events name="{{plugname}}StartTourEvents" onTourStart="{{plugname}}CallOnStartTour();" keep="true" />
+{% endif %}
+
+<action name="{{plugname}}CallOnStartTour">
+{% if project.startWithControlsHidden %}
+	{% comment %}<!-- Minimize bar -->{% endcomment %}
+	{% if p.hideonhidecontrols.value %}
+	{% comment %}<!-- force a call to hidetourcontrols event -->{% endcomment %}
+	{% include 'hidetourcontrolscall.tmpl'%}
+	{% else %}
+	{% if p.hidecontrols.enabled %}
+	{{plugname}}hideMenuControls();
+	{% else %}
+	{{plugname}}showMenuControls();
+	{% endif %}
+	{% endif %}
+{% else %}
+	{% comment %}<!-- Maximize bar -->{% endcomment %}
+	{% if p.hideonhidecontrols.value %}
+	{% comment %}<!-- force a call to showtourcontrols event -->{% endcomment %}
+	{% include 'showtourcontrolscall.tmpl'%}
+	{% else %}
+	{{plugname}}showMenuControls();
+	{% endif %}
+{% endif %}
+</action>
+
+
+
+    <layer name="{{plugname}}_bg"
+           keep="true"
+           url="%FIRSTXML%/{{pluginDirectory}}/footer.png"
+           zorder="{{g_zorder}}"
+           width="100%"
+           align="bottomleft"
+           x="0"
+           visible="false" />
+
+{% if p.buttonbg.value %}
+    <style name="{{plugname}}_btn_style_bg"
+            keep="true"
+            parent="{{plugname}}_bg"
+            crop="0|0|{{icon_width}}|{{icon_width}}"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_bg.png"
+            align="bottomright"
+            height="{{button_width}}"
+            width="{{button_width}}"
+            alpha="0.3"
+            y="5"
+            zorder="0"
+            />
+    <style name="{{plugname}}_btn_style_bg_off"
+            keep="true"
+            parent="{{plugname}}_bg"
+            crop="0|0|{{icon_width}}|{{icon_width}}"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_bg.png"
+            align="bottomright"
+            height="{{button_width}}"
+            width="{{button_width}}"
+            alpha="0.3"
+            y="5"
+            zorder="0"
+            />
+{% endif %}
+
+{% if p.highlighton.value %}
+    <style name="{{plugname}}_btn_style_on_bg"
+           keep="true"
+           parent="{{plugname}}_bg"
+           crop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_bg.png"
+           align="bottomright"
+           height="{{button_width}}"
+           width="{{button_width}}"
+           alpha="0.3"
+           y="5"
+           zorder="0"
+           />
+    <style name="{{plugname}}_btn_style_on_bg_off"
+           keep="true"
+           parent="{{plugname}}_bg"
+           crop="0|0|{{icon_width}}|{{icon_width}}"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_bg.png"
+           align="bottomright"
+           height="{{button_width}}"
+           width="{{button_width}}"
+           alpha="0.3"
+           y="5"
+           zorder="0"
+           />
+{% endif %}
+
+    <style name="{{plugname}}_btn_down_style"
+           keep="true"
+           parent="{{plugname}}_bg"
+                 crop="0| 0|{{icon_width}}|{{icon_width}}"
+           onovercrop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+           ondowncrop="0|{{icon_width|multiply:2}}|{{icon_width}}|{{icon_width}}"
+           align="bottomright"
+           height="{{button_width}}"
+           width="{{button_width}}"
+           x="0" y="5"
+           zorder="1"
+{% if p.tooltips.value %}
+           onhover="showTooltip('plugin'{% ifequal custom_tooltip_style "true" %},{{plugname}}menuTooltipStyle{% endifequal %});"
+{% endif %}
+{% if p.buttonbg.value %}
+           onover="{{plugname}}ctrl_btn_onoveraction"
+           onout="{{plugname}}ctrl_btn_onoutaction"
+{% else %}
+{% if p.tooltips.value %}
+           onout="hideTooltip();"
+{% endif %}
+{% endif %}
+           />
+
+    <style name="{{plugname}}_btn_style"
+           keep="true"
+           parent="{{plugname}}_bg"
+                 crop="0| 0|{{icon_width}}|{{icon_width}}"
+           onovercrop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+           ondowncrop="0|{{icon_width|multiply:2}}|{{icon_width}}|{{icon_width}}"
+           align="bottomright"
+           height="{{button_width}}"
+           width="{{button_width}}"
+           x="0" y="5"
+           zorder="1"
+{% if p.tooltips.value %}
+           onhover="showTooltip('plugin'{% ifequal custom_tooltip_style "true" %},{{plugname}}menuTooltipStyle{% endifequal %});"
+{% endif %}
+{% if p.buttonbg.value %}
+           onover="{{plugname}}ctrl_btn_onoveraction"
+           ondown="{{plugname}}ctrl_btn_ondownaction"
+           onout="{{plugname}}ctrl_btn_onoutaction"
+{% else %}
+{% if p.tooltips.value %}
+           onout="hideTooltip();"
+{% endif %}
+{% endif %}
+           />
+    <style name="{{plugname}}_btn_style_off"
+           keep="true"
+           parent="{{plugname}}_bg"
+           align="bottomright"
+           height="{{button_width}}"
+           width="{{button_width}}"
+           x="0" y="5"
+           zorder="1"
+{% if p.tooltips.value %}
+           onhover="showTooltip('plugin'{% ifequal custom_tooltip_style "true" %},{{plugname}}menuTooltipStyle{% endifequal %});"
+{% endif %}
+{% if p.tooltips.value %}
+           onout="hideTooltip();"
+{% endif %}
+           />
+
+{% if p.buttonbg.value %}
+  <action name="{{plugname}}ctrl_btn_onoveraction">
+    txtadd(btn_bg_name, get(name), "_bg");
+    set(layer[get(btn_bg_name)].crop, "0|{{icon_width}}|{{icon_width}}|{{icon_width}}");
+  </action>
+
+  <action name="{{plugname}}ctrl_btn_ondownaction">
+    txtadd(btn_bg_name, get(name), "_bg");
+    set(layer[get(btn_bg_name)].crop, "0|{{icon_width|multiply:2}}|{{icon_width}}|{{icon_width}}");
+  </action>
+
+  <action name="{{plugname}}ctrl_btn_onoutaction">
+    txtadd(btn_bg_name, get(name), "_bg");
+    set(layer[get(btn_bg_name)].crop, "0|0|{{icon_width}}|{{icon_width}}");
+    {% if p.tooltips.value %}hideTooltip();{% endif %}
+  </action>
+{% endif %}
+
+{% if p.highlighton.value %}
+    <style name="{{plugname}}_btn_style_on"
+            keep="true"
+            parent="{{plugname}}_bg"
+                  crop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+            onovercrop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+            ondowncrop="0|{{icon_width|multiply:2}}|{{icon_width}}|{{icon_width}}"
+            align="bottomright"
+            height="{{button_width}}"
+            width="{{button_width}}"
+            y="5"
+            zorder="1"
+{% if p.tooltips.value %}
+            onhover="showTooltip('plugin'{% ifequal custom_tooltip_style "true" %},{{plugname}}menuTooltipStyle{% endifequal %});"
+            onout="hideTooltip();"
+{% endif %}
+            />
+    <style name="{{plugname}}_btn_style_on_off"
+            keep="true"
+            parent="{{plugname}}_bg"
+            align="bottomright"
+            height="{{button_width}}"
+            width="{{button_width}}"
+            y="5"
+            zorder="1"
+{% if p.tooltips.value %}
+            onhover="showTooltip('plugin'{% ifequal custom_tooltip_style "true" %},{{plugname}}menuTooltipStyle{% endifequal %});"
+            onout="hideTooltip();"
+{% endif %}
+            />
+
+{% endif %}
+{% if p.hidespots.enabled %}
+	<events name="{{plugname}}hotspotsdisplayevents"
+		hotspots_visibility_changed="{{plugname}}updateHideShowHotspotsButtons"
+		keep="true"/>
+	<action name="{{plugname}}HideHideShowHotspotsButtons">
+		set(layer[{{plugname}}btn_show_hotspots].visible, false);
+		set(layer[{{plugname}}btn_hide_hotspots].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_show_hotspots_bg].visible, false);
+		set(layer[{{plugname}}btn_hide_hotspots_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowHideShowHotspotsButtons">
+		if (tour_displayspots,
+			set(layer[{{plugname}}btn_hide_hotspots].visible, true);
+			set(layer[{{plugname}}btn_show_hotspots].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_hide_hotspots_bg].visible, true);
+			set(layer[{{plugname}}btn_show_hotspots_bg].visible, false);{% endif %}
+		,
+			set(layer[{{plugname}}btn_show_hotspots].visible, true);
+			set(layer[{{plugname}}btn_hide_hotspots].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_show_hotspots_bg].visible, true);
+			set(layer[{{plugname}}btn_hide_hotspots_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateHideShowHotspotsButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowHideShowHotspotsButtons();
+		,
+			{{plugname}}HideHideShowHotspotsButtons();
+		);
+	</action>
+
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_hide_hotspots_bg" style="{{plugname}}_btn_style{%if p.highlighton.value %}_on{%endif%}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_hide_hotspots"
+           style="{{plugname}}_btn_style{%if p.highlighton.value %}_on{%endif%}"
+           visible="false"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_hide_show_hotspots.png"
+           onclick="{% include 'hidehotspotscall.tmpl'%}"
+{% if p.tooltips.value %}
+           tooltip="{{p.hideSpotsTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_show_hotspots_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_show_hotspots"
+           style="{{plugname}}_btn_style"
+           visible="false"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_hide_show_hotspots.png"
+           onclick="{% include 'showhotspotscall.tmpl'%}"
+{% if p.tooltips.value %}
+           tooltip="{{p.showSpotsTip.messageid}}"
+{% endif %}
+           />
+
+{% endif %}
+
+{% if p.gyro.enabled %}
+  <events name="{{plugname}}gyroscopeavailableevent"
+          ongyroscopeavailable="{{plugname}}updateGyroscopeButtonsAvailability();"
+          ongyroscopeunavailable="{{plugname}}updateGyroscopeButtonsAvailability();"
+          ongyroscopeon="{{plugname}}enableGyroscopeButtons(true);"
+          ongyroscopeoff="{{plugname}}enableGyroscopeButtons(false);"
+          keep="true" devices="html5" />
+  <krpano {{plugname}}menugyroscopeavailable="false" {{plugname}}menugyroscopeenabled="false"/>
+  <action name="{{plugname}}updateGyroscopeButtonsAvailability">
+    if (tour_gyroscopedevices,
+      set({{plugname}}menugyroscopeavailable, true);
+      {{plugname}}updateGyroscopeButtons();
+    ,
+      set({{plugname}}menugyroscopeavailable, false);
+      {{plugname}}updateGyroscopeButtons();
+    );
+  </action>
+  <action name="{{plugname}}enableGyroscopeButtons">
+    if (tour_gyroscopedevices,
+      set({{plugname}}menugyroscopeenabled, %1);
+      {{plugname}}updateGyroscopeButtons();
+    );
+  </action>
+	<action name="{{plugname}}HideGyroscopeButtons">
+		set(layer[{{plugname}}btn_gyroscope_off].visible, false);
+		set(layer[{{plugname}}btn_gyroscope_on].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_off_bg].visible, false);
+		set(layer[{{plugname}}btn_gyroscope_on_bg].visible, false);{% endif %}
+		if('%1' == 'true' AND plugin[gyroscope],
+			set(layer[{{plugname}}btn_gyroscope_not].visible, true);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_not_bg].visible, true);{% endif %}
+		,
+			set(layer[{{plugname}}btn_gyroscope_not].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_not_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}ShowGyroscopeButtons">
+		if ({{plugname}}menugyroscopeavailable,
+			if ({{plugname}}menugyroscopeenabled,
+				set(layer[{{plugname}}btn_gyroscope_off].visible, true);
+				set(layer[{{plugname}}btn_gyroscope_on].visible, false);
+				{% if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_off_bg].visible, true);
+				set(layer[{{plugname}}btn_gyroscope_on_bg].visible, false);{% endif %}
+			,
+				set(layer[{{plugname}}btn_gyroscope_off].visible, false);
+				set(layer[{{plugname}}btn_gyroscope_on].visible, true);
+				{% if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_off_bg].visible, false);
+				set(layer[{{plugname}}btn_gyroscope_on_bg].visible, true);{% endif %}
+			);
+			set(layer[{{plugname}}btn_gyroscope_not].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_gyroscope_not_bg].visible, false);{% endif %}
+		,
+			{{plugname}}HideGyroscopeButtons(true);
+		);
+	</action>
+	<action name="{{plugname}}updateGyroscopeButtons">
+		if (tour_gyroscopedevices,
+			{% if p.hideonhidecontrols.value %}
+			if (tour_displaycontrols,
+			{% else %}
+			if ({{plugname}}IsOpened,
+			{%endif%}
+				{{plugname}}ShowGyroscopeButtons();
+			,
+				{{plugname}}HideGyroscopeButtons();
+			);
+		,
+			{% if p.hideonhidecontrols.value %}
+			if (tour_displaycontrols,
+			{% else %}
+			if ({{plugname}}IsOpened,
+			{%endif%}
+				{{plugname}}HideGyroscopeButtons(true);
+			,
+				{{plugname}}HideGyroscopeButtons();
+			);
+		);
+	</action>
+
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_gyroscope_off_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" devices="html5" />
+{% endif %}
+    <layer name="{{plugname}}btn_gyroscope_off"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_gyroscope.png"
+            style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+            onclick="{%include 'disablegyroscopecall.tmpl'%}"
+            devices="html5"
+{% if p.tooltips.value %}
+            tooltip="{{p.gyroOffTip.messageid}}"
+{% endif %}
+            visible="false"
+            />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_gyroscope_on_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="html5" />
+{% endif %}
+    <layer name="{{plugname}}btn_gyroscope_on"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_gyroscope.png"
+            style="{{plugname}}_btn_style"
+            onclick="{%include 'enablegyroscopecall.tmpl'%}"
+            devices="html5"
+{% if p.tooltips.value %}
+            tooltip="{{p.gyroOnTip.messageid}}"
+{% endif %}
+            visible="false"
+            />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_gyroscope_not_bg" style="{{plugname}}_btn_style_bg_off" visible="false" devices="html5" />
+{% endif %}
+    <layer name="{{plugname}}btn_gyroscope_not"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_gyroscope_off.png"
+            style="{{plugname}}_btn_style_off"
+            enabled="true"
+            capture="false"
+            devices="html5"
+{% if p.tooltips.value %}
+            tooltip="{{p.gyroNotTip.messageid}}"
+{% endif %}
+            visible="false"
+            />
+
+{%endif%}
+
+{% if p.mousecontrol.enabled %}
+	<events name="{{plugname}}controlmodechangedevent" oncontrolmodechanged="{{plugname}}updateControlModeButtons();" keep="true"/>
+	<action name="{{plugname}}HideControlModeButtons">
+		set(layer[{{plugname}}btn_ctrlmode_move_to].visible, false);
+		set(layer[{{plugname}}btn_ctrlmode_drag_to].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_ctrlmode_move_to_bg].visible, false);
+		set(layer[{{plugname}}btn_ctrlmode_drag_to_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowControlModeButtons">
+		if (tour_controlmodemousetype == "moveto",
+			set(layer[{{plugname}}btn_ctrlmode_drag_to].visible, true);
+			set(layer[{{plugname}}btn_ctrlmode_move_to].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_ctrlmode_drag_to_bg].visible, true);
+			set(layer[{{plugname}}btn_ctrlmode_move_to_bg].visible, false);{% endif %}
+		,
+			set(layer[{{plugname}}btn_ctrlmode_move_to].visible, true);
+			set(layer[{{plugname}}btn_ctrlmode_drag_to].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_ctrlmode_move_to_bg].visible, true);
+			set(layer[{{plugname}}btn_ctrlmode_drag_to_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateControlModeButtons">
+	if (device.desktop,
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowControlModeButtons();
+		,
+			{{plugname}}HideControlModeButtons();
+		);
+	,
+		{{plugname}}HideControlModeButtons();
+	);
+	</action>
+
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_ctrlmode_move_to_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="desktop" />
+{% endif %}
+    <layer name="{{plugname}}btn_ctrlmode_move_to"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_move_to.png"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+           tooltip="{{p.ctrlmodeMoveTip.messageid}}"
+{% endif %}
+           onclick="{%include 'setcontrolmodemovetocall.tmpl'%}"
+           visible="false"
+           devices="desktop"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_ctrlmode_drag_to_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="desktop" />
+{% endif %}
+    <layer name="{{plugname}}btn_ctrlmode_drag_to"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_drag_to.png"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+           tooltip="{{p.ctrlmodeDragTip.messageid}}"
+{% endif %}
+           onclick="{%include 'setcontrolmodedragtocall.tmpl'%}"
+           visible="false"
+           devices="desktop"
+           />
+
+{% endif %}
+{% if p.zoom.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_in_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="desktop"/>
+{% endif %}
+    <layer name="{{plugname}}btn_in"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_zoom_in.png"
+           style="{{plugname}}_btn_down_style"
+           ondown="{% if p.buttonbg.value %}{{plugname}}ctrl_btn_ondownaction();{% endif %}{% include 'zoomincall.tmpl' %}"
+           onup="{% include 'stopzoomcall.tmpl' %}"
+{% if p.tooltips.value %}
+           tooltip="{{p.zoomInTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_out_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="desktop"/>
+{% endif %}
+    <layer name="{{plugname}}btn_out"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_zoom_out.png"
+           style="{{plugname}}_btn_down_style"
+           ondown="{% if p.buttonbg.value %}{{plugname}}ctrl_btn_ondownaction();{% endif %}{% include 'zoomoutcall.tmpl' %}"
+           onup="{% include 'stopzoomcall.tmpl' %}"
+{% if p.tooltips.value %}
+           tooltip="{{p.zoomOutTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+
+{% endif %}
+{% if p.home.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_home_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_home"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_home.png"
+           style="{{plugname}}_btn_down_style"
+           onclick="{{plugname}}btn_home_action();"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.homeTip.messageid}}"
+{% endif %}
+           />
+    <action name="{{plugname}}btn_home_action">
+{% ifequal p.homeAction.value "webpage" %}
+  {% if p.webpageurl.value %}
+  {% with p.webpageurl.messageid as websiteurlmessageid %}
+  {% with "_self" as targetarea %}
+        {% include 'openurlactioncall.tmpl'%}
+  {% endwith %}
+  {% endwith %}
+  {% else %}
+    showlog();trace("You forgot to enter an URL");
+  {% endif %}
+{% else %}
+  {% ifequal p.homeAction.value "firstscene" %}
+      mainloadscene({{project.firstPanorama.tourId}});
+  {% else %}
+    {% ifequal p.homeAction.value "startscene" %}
+      mainloadscene(get(startscene));
+    {% else %}
+      hideTooltip();lookto(get(panoview.h),get(panoview.v),get(panoview.fov),smooth(100,20,50));
+      if(scene[get(xml.scene)].video,
+        plugin[get(videointerface_video)].seek(0);
+        ifnot(plugin[get(videointerface_video)].ispaused,
+          plugin[get(videointerface_video)].play();
+        );
+      );
+    {% endifequal %}
+  {% endifequal %}
+{% endifequal %}
+    </action>
+
+{% endif %}
+{% if p.horizontalnavigation.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_left_bg" style="{{plugname}}_btn_style_bg" devices="desktop" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_left"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_move_left.png"
+           style="{{plugname}}_btn_down_style"
+           ondown="{% if p.buttonbg.value %}{{plugname}}ctrl_btn_ondownaction();{% endif %}{%include 'moveleftcall.tmpl'%}"
+           onup="{%include 'stopmovehorizontalcall.tmpl'%}"
+{% if p.tooltips.value %}
+            tooltip="{{p.moveLeftTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_right_bg" style="{{plugname}}_btn_style_bg" devices="desktop" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_right"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_move_right.png"
+           style="{{plugname}}_btn_down_style"
+           ondown="{% if p.buttonbg.value %}{{plugname}}ctrl_btn_ondownaction();{% endif %}{% include 'moverightcall.tmpl'%}"
+           onup="{% include 'stopmovehorizontalcall.tmpl' %}"
+{% if p.tooltips.value %}
+            tooltip="{{p.moveRightTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+
+{% endif %}
+{% if p.verticalnavigation.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_up_bg" style="{{plugname}}_btn_style_bg" devices="desktop" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_up"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_move_up.png"
+           style="{{plugname}}_btn_down_style"
+           ondown="{% if p.buttonbg.value %}{{plugname}}ctrl_btn_ondownaction();{% endif %}{% include 'moveupcall.tmpl'%}"
+           onup="{% include 'stopmoveverticalcall.tmpl' %}"
+{% if p.tooltips.value %}
+            tooltip="{{p.moveUpTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_down_bg" style="{{plugname}}_btn_style_bg" devices="desktop" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_down"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_move_down.png"
+           style="{{plugname}}_btn_down_style"
+           ondown="{% if p.buttonbg.value %}{{plugname}}ctrl_btn_ondownaction();{% endif %}{% include 'movedowncall.tmpl'%}"
+           onup="{% include 'stopmoveverticalcall.tmpl' %}"
+{% if p.tooltips.value %}
+            tooltip="{{p.moveDownTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+
+{% endif %}
+
+{% if p.sounds.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_sound_on_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_sound_on"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_start_sound.png"
+           onclick="{%include 'playtoursoundscall.tmpl'%}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.soundsOnTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_sound_off_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_sound_off"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_stop_sound.png"
+           onclick="{%include 'stoptoursoundscall.tmpl'%}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.soundsOffTip.messageid}}"
+{% endif %}
+           />
+{% endif %}
+
+{% if p.enterVR.enabled %}
+<events name="{{plugname}}vravailableevent"
+		onvravailable="{{plugname}}updateVrButtonsAvailability();"
+		onvrunavailable="{{plugname}}updateVrButtonsAvailability();"
+		keep="true" devices="html5{% if p.mobile_only %}{% if p.mobile_only.value %}.and.mobile{% endif %}{% endif %}" />
+	<krpano {{plugname}}menuvravailable="false" />
+	<action name="{{plugname}}updateVrButtonsAvailability">
+		if (tour_vrdevices,
+			set({{plugname}}menuvravailable, true);
+		,
+			set({{plugname}}menuvravailable, false);
+		);
+		{{plugname}}updateVrButtons();
+	</action>
+	<action name="{{plugname}}HideVrButtons">
+		set(layer[{{plugname}}btn_enter_vr].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg].visible, false);{% endif %}
+		if('%1' == 'true' AND plugin[ptpvrmode],
+			set(layer[{{plugname}}btn_enter_vr_not].visible, true);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg_not].visible, true);{% endif %}
+		,
+			set(layer[{{plugname}}btn_enter_vr_not].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg_not].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}ShowVrButtons">
+		if ({{plugname}}menuvravailable,
+			set(layer[{{plugname}}btn_enter_vr].visible, true);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg].visible, true);{% endif %}
+			set(layer[{{plugname}}btn_enter_vr_not].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_enter_vr_bg_not].visible, false);{% endif %}
+		,
+			{{plugname}}HideVrButtons(true);
+		);
+	</action>
+	<action name="{{plugname}}updateVrButtons">
+	if (tour_vrdevices,
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{% endif %}
+			{{plugname}}ShowVrButtons();
+		,
+			{{plugname}}HideVrButtons();
+		);
+	,
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{% endif %}
+			{{plugname}}HideVrButtons(true);
+		,
+			{{plugname}}HideVrButtons();
+		);
+	);
+	</action>
+
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_enter_vr_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_enter_vr"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_vr_mode.png"
+           onclick="{%include 'webvrcall.tmpl'%}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+           devices="html5{% if p.mobile_only %}{% if p.mobile_only.value %}.and.mobile{% endif %}{% endif %}"
+{% if p.tooltips.value %}
+           tooltip="{{p.enterVRTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_enter_vr_bg_not" style="{{plugname}}_btn_style_bg_off" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_enter_vr_not"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_vr_mode_off.png"
+           style="{{plugname}}_btn_style_off"
+{% if p.tooltips.value %}
+           tooltip="{{p.enterVRNotTip.messageid}}"
+{% endif %}
+           enabled="true"
+           capture="false"
+           visible="false"
+           devices="html5{% if p.mobile_only %}{% if p.mobile_only.value %}.and.mobile{% endif %}{% endif %}"
+           />
+{% endif %}
+
+
+{% if p.prevnext.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_prev_pano_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_prev_pano"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_previous_scene.png"
+           onclick="{% if p.prevNextAction %}{% ifequal p.prevNextAction.value 'group' %}{% include 'loadprevgroupcall.tmpl' %}{% else %}{% include 'loadprevscenecall.tmpl' %}{% endifequal %}{% else %}{% include 'loadprevscenecall.tmpl' %}{% endif %}"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+           tooltip="{{p.prevSceneTip.messageid}}"
+{% endif %}
+           visible="false"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_next_pano_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_next_pano"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_next_scene.png"
+           onclick="{% if p.prevNextAction %}{% ifequal p.prevNextAction.value 'group' %}{% include 'loadnextgroupcall.tmpl' %}{% else %}{% include 'loadnextscenecall.tmpl' %}{% endifequal %}{% else %}{% include 'loadnextscenecall.tmpl' %}{% endif %}"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+            tooltip="{{p.nextSceneTip.messageid}}"
+{% endif %}
+           visible="false"
+           />
+
+{%endif%}
+
+{% if p.videoplaypause.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_play_video_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_play_video"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_start_videoplayer.png"
+           onclick="{% include 'videointerfacecall.tmpl' %}"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+           tooltip="{{p.playVideoTip.messageid}}"
+{% endif %}
+           visible="false"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_pause_video_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_pause_video"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_pause_videoplayer.png"
+           onclick="{% include 'videointerfacecall.tmpl' %}"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+           tooltip="{{p.pauseVideoTip.messageid}}"
+{% endif %}
+           visible="false"
+           />
+
+    <events name="{{plugname}}hideshowvideoplayerevent" onplayvideointerface="{{plugname}}updateHideShowVideoplayerButtons();" onpausevideointerface="{{plugname}}updateHideShowVideoplayerButtons();" keep="true"/>
+    <action name="{{plugname}}HideHideShowVideoplayerButtons">
+      set(layer[{{plugname}}btn_play_video].visible, false);
+      set(layer[{{plugname}}btn_pause_video].visible, false);
+      {% if p.buttonbg.value %}set(layer[{{plugname}}btn_pause_video_bg].visible, false);
+      set(layer[{{plugname}}btn_play_video_bg].visible, false);{% endif %}
+    </action>
+    <action name="{{plugname}}ShowHideShowVideoplayerButtons">
+      if({{plugname}}_use_videoplayer_interface,
+        if (plugin[get(videointerface_video)],
+        if (plugin[get(videointerface_video)].ispaused,
+          set(layer[{{plugname}}btn_play_video].visible, true);
+          set(layer[{{plugname}}btn_pause_video].visible, false);
+          {% if p.buttonbg.value %}set(layer[{{plugname}}btn_pause_video_bg].visible, false);
+          set(layer[{{plugname}}btn_play_video_bg].visible, true);{% endif %}
+        ,
+          set(layer[{{plugname}}btn_pause_video].visible, true);
+          set(layer[{{plugname}}btn_play_video].visible, false);
+          {% if p.buttonbg.value %}set(layer[{{plugname}}btn_pause_video_bg].visible, true);
+          set(layer[{{plugname}}btn_play_video_bg].visible, false);{% endif %}
+        ););
+      ,
+        {{plugname}}HideHideShowVideoplayerButtons();
+      );
+    </action>
+    <action name="{{plugname}}updateHideShowVideoplayerButtons">
+      {% if p.hideonhidecontrols.value %}
+      if (tour_displaycontrols,
+      {% else %}
+      if ({{plugname}}IsOpened,
+      {% endif %}
+        {{plugname}}ShowHideShowVideoplayerButtons();
+      ,
+        {{plugname}}HideHideShowVideoplayerButtons();
+      );
+    </action>
+{% endif %}
+
+{% if p.hidethumbnails.enabled %}
+{% ifnotequal project.panoramas.count 1 %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_hide_thumbnails_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false"/>
+{% endif %}
+    <layer name="{{plugname}}btn_hide_thumbnails"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_hide_thumbnails.png"
+           onclick="{%include 'hidetourthumbnailscall.tmpl'%}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.hideThumbnailsTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_show_thumbnails_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_show_thumbnails"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_show_thumbnails.png"
+           onclick="{%include 'showtourthumbnailscall.tmpl'%}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.showThumbnailsTip.messageid}}"
+{% endif %}
+           />
+
+	<events name="{{plugname}}hideshowthumbnailsevent" hidetourthumbnails="{{plugname}}updateHideShowThumbnailsButtons();" showtourthumbnails="{{plugname}}updateHideShowThumbnailsButtons();" keep="true"/>
+	<action name="{{plugname}}HideHideShowThumbnailsButtons">
+		set(layer[{{plugname}}btn_show_thumbnails].visible, false);
+		set(layer[{{plugname}}btn_hide_thumbnails].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_show_thumbnails_bg].visible, false);
+		set(layer[{{plugname}}btn_hide_thumbnails_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowHideShowThumbnailsButtons">
+		if (tour_displaythumbnails,
+			set(layer[{{plugname}}btn_hide_thumbnails].visible, true);
+			set(layer[{{plugname}}btn_show_thumbnails].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_hide_thumbnails_bg].visible, true);
+			set(layer[{{plugname}}btn_show_thumbnails_bg].visible, false);{% endif %}
+		,
+			set(layer[{{plugname}}btn_show_thumbnails].visible, true);
+			set(layer[{{plugname}}btn_hide_thumbnails].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_show_thumbnails_bg].visible, true);
+			set(layer[{{plugname}}btn_hide_thumbnails_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateHideShowThumbnailsButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowHideShowThumbnailsButtons();
+		,
+			{{plugname}}HideHideShowThumbnailsButtons();
+		);
+	</action>
+{% endifnotequal %}
+
+{%endif%}
+
+{% if p.displaymap.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_display_map_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_display_map"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_map.png"
+           onclick="{% include 'showmapcall.tmpl' %}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.displayMapTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_hide_map_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_hide_map"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_map.png"
+           onclick="{% include 'hidemapcall.tmpl' %}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.hideMapTip.messageid}}"
+{% endif %}
+           />
+
+{%endif%}
+{% if p.displayfloorplan.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_display_floorplan_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_display_floorplan"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_floorplan.png"
+           onclick="{% include 'showfloorplancall.tmpl' %}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.displayFloorplanTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_hide_floorplan_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_hide_floorplan"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_floorplan.png"
+           onclick="{% include 'hidefloorplancall.tmpl' %}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.hideFloorplanTip.messageid}}"
+{% endif %}
+           />
+{%endif%}
+{% if p.share.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_share_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_share"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_share.png"
+            onclick="{% include 'sharetourcall.tmpl'%}"
+            style="{{plugname}}_btn_style"
+            visible="false"
+{% if p.tooltips.value %}
+            tooltip="{{p.shareTip.messageid}}"
+{% endif %}
+            />
+
+{% endif %}
+
+{% if p.fullscreen.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_openfs_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="fullscreensupport" />
+{% endif %}
+    <layer name="{{plugname}}btn_openfs"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_enter_fs.png"
+           onclick="{%include 'enterfullscreencall.tmpl'%}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.openFsTip.messageid}}"
+{% endif %}
+           devices="fullscreensupport"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_closefs_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" devices="fullscreensupport" />
+{% endif %}
+    <layer name="{{plugname}}btn_closefs"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_close_fs.png"
+           onclick="{%include 'exitfullscreencall.tmpl'%}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.closeFsTip.messageid}}"
+{% endif %}
+           devices="fullscreensupport"
+           />
+
+{%endif%}
+{% if p.autorotation.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_autorotate_on_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_autorotate_on"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_start_autorotation.png"
+{% if p.useAutorotationDelay %}
+{% if p.useAutorotationDelay.value %}
+           onclick="{%include 'startautorotationcall.tmpl'%}"
+{% else %}
+           onclick="{%include 'resumeautorotationcall.tmpl'%}"
+{% endif %}
+{% else %}
+           onclick="{%include 'resumeautorotationcall.tmpl'%}"
+{% endif %}
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+            tooltip="{{p.autorotateOnTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_autorotate_off_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_autorotate_off"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_stop_autorotation.png"
+{% if p.useAutorotationDelay %}
+{% if p.useAutorotationDelay.value %}
+           onclick="{%include 'stopautorotationcall.tmpl'%}"
+{% else %}
+           onclick="{%include 'pauseautorotationcall.tmpl'%}"
+{% endif %}
+{% else %}
+           onclick="{%include 'pauseautorotationcall.tmpl'%}"
+{% endif %}
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.autorotateOffTip.messageid}}"
+{% endif %}
+           />
+
+{% endif %}
+
+{% if p.autotour.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_autotour_on_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_autotour_on"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_start_automatic_tour.png"
+           onclick="{%include 'startautotourcall.tmpl'%}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+            tooltip="{{p.autotourOnTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_autotour_off_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_autotour_off"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_stop_automatic_tour.png"
+           onclick="{% include 'stopautotourcall.tmpl'%}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.autotourOffTip.messageid}}"
+{% endif %}
+           />
+
+{% endif %}
+
+{% if p.displayhelp.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_display_help_bg" style="{{plugname}}_btn_style_bg" visible="false" devices="desktop" />
+{% endif %}
+    <layer name="{{plugname}}btn_display_help"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_help.png"
+           onclick="{{plugname}}displayHelp();"
+           style="{{plugname}}_btn_style"
+{% if p.tooltips.value %}
+           tooltip="{{p.displayHelpTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           visible="false"
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_close_help_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" devices="desktop"/>
+{% endif %}
+    <layer name="{{plugname}}btn_close_help"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_help.png"
+           onclick="{{plugname}}closeHelp();"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.hideHelpTip.messageid}}"
+{% endif %}
+           devices="desktop"
+           />
+
+{% endif %}
+
+{% if p.displayinfo.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_display_info_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_display_info"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_info.png"
+           onclick="{% include 'showtourinfocall.tmpl' %}"
+           style="{{plugname}}_btn_style"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.displayInfoTip.messageid}}"
+{% endif %}
+           />
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_close_info_bg" style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_close_info"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_info.png"
+           onclick="{% include 'hidetourinfocall.tmpl' %}"
+           style="{{plugname}}_btn_style{% if p.highlighton.value %}_on{% endif %}"
+           visible="false"
+{% if p.tooltips.value %}
+           tooltip="{{p.hideInfoTip.messageid}}"
+{% endif %}
+           />
+
+{% endif %}
+
+{% if p.hidecontrols.enabled %}
+{% if p.buttonbg.value %}
+    <layer name="{{plugname}}btn_hidecontrols_bg" style="{{plugname}}_btn_style_bg" visible="false" />
+{% endif %}
+    <layer name="{{plugname}}btn_hidecontrols"
+           url="%FIRSTXML%/{{pluginDirectory}}/btn_hide_controls.png"
+           style="{{plugname}}_btn_style"
+           onclick="{% if not p.hideonhidecontrols.value %}{% comment %}<!-- force call to display because bar doesn't respond to showtourcontrols event -->{% endcomment %}{{plugname}}hideMenuControls();{% endif %}{% include 'hidetourcontrolscall.tmpl'%}"
+           visible="false"
+{% if p.tooltips.value %}
+            tooltip="{{p.hideControlsTip.messageid}}"
+{% endif %}
+           />
+
+    <layer name="{{plugname}}btn_showcontrols"
+                  crop="0| 0|{{icon_width}}|{{icon_width}}"
+            onovercrop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+            ondowncrop="0|{{icon_width|multiply:2}}|{{icon_width}}|{{icon_width}}"
+            keep="true"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_show_controls_bg.png"
+            align="bottomright"
+            zorder="{{g_zorder}}"
+            height="{{button_width}}"
+            width="{{button_width}}"
+            visible="false"
+            y="12"
+            x="0" >
+    <layer name="{{plugname}}btn_showcontrols_fg"
+                  crop="0| 0|{{icon_width}}|{{icon_width}}"
+            onovercrop="0|{{icon_width}}|{{icon_width}}|{{icon_width}}"
+            ondowncrop="0|{{icon_width|multiply:2}}|{{icon_width}}|{{icon_width}}"
+            onclick="{% if not p.hideonhidecontrols.value %}{% comment %}<!-- force call to display because bar doesn't respond to showtourcontrols event -->{% endcomment %}{{plugname}}showMenuControls();{% endif %}{% include 'showtourcontrolscall.tmpl'%}"
+{% if p.tooltips.value %}
+            onhover="showTooltip('plugin'{% ifequal custom_tooltip_style "true" %},{{plugname}}menuTooltipStyle{% endifequal %});"
+            onout="hideTooltip();"
+            tooltip="{{p.displayControlsTip.messageid}}"
+{% endif %}
+            keep="true"
+            url="%FIRSTXML%/{{pluginDirectory}}/btn_show_controls.png"
+            align="center"
+            height="{{button_width}}"
+            width="{{button_width}}"
+            />
+    </layer>
+
+{%endif%}
+{% if p.hideonhidecontrols.value %}
+<events name="{{plugname}}hideshowcontrolsevent"
+	hidetourcontrols="{{plugname}}hideMenuControls();"
+	showtourcontrols="{{plugname}}showMenuControls();"
+	keep="true"/>
+
+{% endif %}
+{% comment %}<!-- hide menu and show menu can be called without hide/show controls button -->{% endcomment %}
+<action name="{{plugname}}hideMenuControls">
+	set({{plugname}}IsOpened, false);
+	set(layer[{{plugname}}_bg].visible, false);
+	{% if p.hidecontrols.enabled %}
+	set(layer[{{plugname}}btn_showcontrols].visible, true);
+	{% if p.buttonbg.value %}set(layer[{{plugname}}btn_hidecontrols_bg].visible, false);{% endif %}
+	set(layer[{{plugname}}btn_hidecontrols].visible, false);
+	{% endif %}
+	{% if p.zoom.enabled %}
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_in_bg].visible, false);
+	set(layer[{{plugname}}btn_out_bg].visible, false);
+	{% endif %}
+	set(layer[{{plugname}}btn_in].visible, false);
+	set(layer[{{plugname}}btn_out].visible, false);
+	{% endif %}
+	{% if p.home.enabled %}
+	{% if p.buttonbg.value %}set(layer[{{plugname}}btn_home_bg].visible, false);{% endif %}
+	set(layer[{{plugname}}btn_home].visible, false);
+	{% endif %}
+	{% if p.horizontalnavigation.enabled %}
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_right_bg].visible, false);
+	set(layer[{{plugname}}btn_left_bg].visible, false);
+	{% endif %}
+	set(layer[{{plugname}}btn_right].visible, false);
+	set(layer[{{plugname}}btn_left].visible, false);
+	{% endif %}
+	{% if p.verticalnavigation.enabled %}
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_down_bg].visible, false);
+	set(layer[{{plugname}}btn_up_bg].visible, false);
+	{% endif %}
+	set(layer[{{plugname}}btn_down].visible, false);
+	set(layer[{{plugname}}btn_up].visible, false);
+	{% endif %}
+	{% if p.prevnext.enabled %}
+	if (scene.count GT 1,
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_prev_pano_bg].visible, false);
+	set(layer[{{plugname}}btn_next_pano_bg].visible, false);
+	{% endif %}
+	set(layer[{{plugname}}btn_prev_pano].visible, false);
+	set(layer[{{plugname}}btn_next_pano].visible, false);
+	);
+	{% endif %}
+	{% if p.autorotation.enabled %}
+		{{plugname}}updateAutorotationButtons();
+	{% endif %}
+
+	{% if p.videoplaypause.enabled %}
+	{{plugname}}updateHideShowVideoplayerButtons();
+	{% endif %}
+	{% if p.share.enabled %}
+	{% if p.buttonbg.value %}set(layer[{{plugname}}btn_share_bg].visible, false);{% endif %}
+	set(layer[{{plugname}}btn_share].visible, false);
+	{% endif %}
+	{% if p.gyro.enabled %}
+		{{plugname}}updateGyroscopeButtons();
+	{% endif %}
+	{% if p.sounds.enabled %}
+		{{plugname}}updateSoundButtons();
+	{% endif %}
+	{% if p.displaymap.enabled %}
+		{{plugname}}updateMapButtons();
+	{% endif %}
+	{% if p.displayfloorplan.enabled %}
+		{{plugname}}updateFloorplanButtons();
+	{% endif %}
+	{% if p.autotour.enabled %}
+		{{plugname}}updateAutotourButtons();
+	{% endif %}
+	{% if p.displayinfo.enabled %}
+		{{plugname}}updateInfoButtons();
+	{% endif %}
+	{% if p.enterVR.enabled %}
+		{{plugname}}updateVrButtons();
+	{% endif %}
+
+	{% if p.hidespots.enabled %}
+		{{plugname}}updateHideShowHotspotsButtons();
+	{% endif %}
+	{% if p.mousecontrol.enabled %}
+		{{plugname}}updateControlModeButtons();
+	{% endif %}
+	{% if p.hidethumbnails.enabled %}
+	{% ifnotequal project.panoramas.count 1 %}
+		{{plugname}}updateHideShowThumbnailsButtons();
+	{% endifnotequal %}
+	{% endif %}
+	{% if p.fullscreen.enabled %}
+		{{plugname}}updateFullscreenButtons();
+	{% endif %}
+	{% if p.displayhelp.enabled %}
+		{{plugname}}updateHelpButtons();
+	{% endif %}
+</action>
+<action name="{{plugname}}showMenuControls">
+	set({{plugname}}IsOpened, true);
+{% if p.fullscreen.enabled %}
+      {{plugname}}updateFullscreenButtons();
+{%endif%}
+{% if p.autorotation.enabled %}
+      {{plugname}}updateAutorotationButtons();
+{%endif%}
+
+{% if p.displayinfo.enabled %}
+      {{plugname}}updateInfoButtons();
+{%endif%}
+{% if p.autotour.enabled %}
+      {{plugname}}updateAutotourButtons();
+{%endif%}
+{% if p.sounds.enabled %}
+      {{plugname}}updateSoundButtons();
+{%endif%}
+{% if p.gyro.enabled %}
+      {{plugname}}updateGyroscopeButtons();
+{%endif%}
+{% if p.displaymap.enabled %}
+      {{plugname}}updateMapButtons();
+{%endif%}
+{% if p.displayfloorplan.enabled %}
+      {{plugname}}updateFloorplanButtons();
+{%endif%}
+{% if p.videoplaypause.enabled %}
+	{{plugname}}updateHideShowVideoplayerButtons();
+{% endif %}
+{% if p.share.enabled %}
+	{% if p.buttonbg.value %}set(layer[{{plugname}}btn_share_bg].visible, true);{% endif %}
+	set(layer[{{plugname}}btn_share].visible, true);
+{% endif %}
+{% if p.enterVR.enabled %}
+	{{plugname}}updateVrButtons();
+{% endif %}
+
+{% if p.mousecontrol.enabled %}
+      {{plugname}}updateControlModeButtons();
+{%endif%}
+{% if p.hidespots.enabled %}
+      {{plugname}}updateHideShowHotspotsButtons();
+{%endif%}
+{% if p.hidethumbnails.enabled %}
+{% ifnotequal project.panoramas.count 1 %}
+      {{plugname}}updateHideShowThumbnailsButtons();
+{% endifnotequal %}
+{%endif%}
+{% if p.displayhelp.enabled %}
+      {{plugname}}updateHelpButtons();
+{% endif %}
+      set(layer[{{plugname}}_bg].visible, true);
+{% if p.hidecontrols.enabled %}
+	set(layer[{{plugname}}btn_showcontrols].visible, false);
+	{% if p.buttonbg.value %}set(layer[{{plugname}}btn_hidecontrols_bg].visible, true);{% endif %}
+	set(layer[{{plugname}}btn_hidecontrols].visible, true);
+{% endif %}
+{% if p.zoom.enabled %}
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_in_bg].visible, true);
+	set(layer[{{plugname}}btn_out_bg].visible, true);
+	{% endif %}
+	set(layer[{{plugname}}btn_in].visible, true);
+	set(layer[{{plugname}}btn_out].visible, true);
+{% endif %}
+{% if p.home.enabled %}
+	{% if p.buttonbg.value %}set(layer[{{plugname}}btn_home_bg].visible, true);{% endif %}
+	set(layer[{{plugname}}btn_home].visible, true);
+{% endif %}
+{% if p.horizontalnavigation.enabled %}
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_right_bg].visible, true);
+	set(layer[{{plugname}}btn_left_bg].visible, true);
+	{% endif %}
+	set(layer[{{plugname}}btn_right].visible, true);
+	set(layer[{{plugname}}btn_left].visible, true);
+{% endif %}
+{% if p.verticalnavigation.enabled %}
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_down_bg].visible, true);
+	set(layer[{{plugname}}btn_up_bg].visible, true);
+	{% endif %}
+	set(layer[{{plugname}}btn_down].visible, true);
+	set(layer[{{plugname}}btn_up].visible, true);
+{% endif %}
+{% if p.prevnext.enabled %}
+	if (scene.count GT 1,
+	{% if p.buttonbg.value %}
+	set(layer[{{plugname}}btn_prev_pano_bg].visible, true);
+	set(layer[{{plugname}}btn_next_pano_bg].visible, true);
+	{% endif %}
+	set(layer[{{plugname}}btn_prev_pano].visible, true);
+	set(layer[{{plugname}}btn_next_pano].visible, true);
+	);
+{% endif %}
+
+	{% comment %}<!-- update thumbnailsBar size and position on visible layer -->{% endcomment %}
+	{% if p.displaythumbnails.value %}
+		{% ifnotequal project.panoramas.count 1%}
+		{{plugname}}UpdateThumbnailsSize();
+		{%endifnotequal%}
+	{%endif%}
+</action>
+
+{% if p.displayhelp.enabled %}
+
+{% if p.useThemeHelpScreen.value or not p.helpscreenfg.value %}
+    <layer name="{{plugname}}helpScreenBg" align="center" keep="true" onclick="{{plugname}}closeHelp();"
+           url="%FIRSTXML%/{{pluginDirectory}}/help_screen_bg.png"
+           visible="false"
+           zorder="97"
+           >
+{% endif %}
+      <layer name="{{plugname}}helpScreen" align="center" keep="true" onclick="{{plugname}}closeHelp();"
+{% if p.useThemeHelpScreen.value or not p.helpscreenfg.value %}
+             url="%FIRSTXML%/{{pluginDirectory}}/help_screen_fg.png"
+             height="100%"
+             width="prop"
+{% else %}
+{% if p.helpscreenfg.isRemote %}
+             url="{{p.helpscreenfg.value}}"
+{% else %}
+             url="%FIRSTXML%/{{pluginDirectory}}/{{p.helpscreenfg.fileName}}"
+{% endif %}
+             zorder="97"
+             visible="false"
+{% endif %}
+             displayed="false"
+             />
+{% if p.useThemeHelpScreen.value or not p.helpscreenfg.value %}
+    </layer>
+{% endif %}
+    <action name="{{plugname}}displayHelp">
+      if (device.desktop,
+        set(layer[{{plugname}}helpScreen].displayed, true);
+        {% if p.useThemeHelpScreen.value or not p.helpscreenfg.value %}
+        set(layer[{{plugname}}helpScreenBg].visible,true);
+        {% else %}
+        set(layer[{{plugname}}helpScreen].visible,true);
+        {% endif %}
+        {{plugname}}updateHelpButtons();
+      );
+    </action>
+    <action name="{{plugname}}closeHelp">
+      if (device.desktop,
+        set(layer[{{plugname}}helpScreen].displayed, false);
+        {% if p.useThemeHelpScreen.value or not p.helpscreenfg.value %}
+        set(layer[{{plugname}}helpScreenBg].visible,false);
+        {% else %}
+        set(layer[{{plugname}}helpScreen].visible,false);
+        {% endif %}
+        {{plugname}}updateHelpButtons();
+      );
+    </action>
+	<action name="{{plugname}}HideHelpButtons">
+		set(layer[{{plugname}}btn_display_help].visible, false);
+		set(layer[{{plugname}}btn_close_help].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_display_help_bg].visible, false);
+		set(layer[{{plugname}}btn_close_help_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowHelpButtons">
+		if (layer[{{plugname}}helpScreen].displayed,
+			set(layer[{{plugname}}btn_close_help].visible, true);
+			set(layer[{{plugname}}btn_display_help].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_close_help_bg].visible, true);
+			set(layer[{{plugname}}btn_display_help_bg].visible, false);{% endif %}
+		,
+			set(layer[{{plugname}}btn_display_help].visible, true);
+			set(layer[{{plugname}}btn_close_help].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_display_help_bg].visible, true);
+			set(layer[{{plugname}}btn_close_help_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateHelpButtons">
+	if (device.desktop,
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowHelpButtons();
+		,
+			{{plugname}}HideHelpButtons();
+		);
+	,
+		{{plugname}}HideHelpButtons();
+	);
+	</action>
+
+{% endif %}
+
+{% if p.displayinfo.enabled %}
+	<events name="{{plugname}}HideShowInfoEvent"
+		onhidetourinfo="{{plugname}}updateInfoButtons();"
+		onshowtourinfo="{{plugname}}updateInfoButtons();"
+		keep="true" />
+	<action name="{{plugname}}HideInfoButtons">
+		set(layer[{{plugname}}btn_display_info].visible, false);
+		set(layer[{{plugname}}btn_close_info].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_display_info_bg].visible, false);
+		set(layer[{{plugname}}btn_close_info_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowInfoButtons">
+		if (tour_displayinfo,
+			set(layer[{{plugname}}btn_close_info].visible, true);
+			set(layer[{{plugname}}btn_display_info].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_close_info_bg].visible, true);
+			set(layer[{{plugname}}btn_display_info_bg].visible, false);{% endif %}
+		,
+			set(layer[{{plugname}}btn_display_info].visible, true);
+			set(layer[{{plugname}}btn_close_info].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_display_info_bg].visible, true);
+			set(layer[{{plugname}}btn_close_info_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateInfoButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowInfoButtons();
+		,
+			{{plugname}}HideInfoButtons();
+		);
+	</action>
+
+{% endif %}
+{% if p.displaymap.enabled %}
+	<events name="{{plugname}}HideShowMapEvent"
+		onhidetourmap="{{plugname}}updateMapButtons();"
+		onshowtourmap="{{plugname}}updateMapButtons();"
+		keep="true" />
+	<action name="{{plugname}}HideMapButtons">
+		set(layer[{{plugname}}btn_display_map].visible, false);
+		set(layer[{{plugname}}btn_hide_map].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_display_map_bg].visible, false);
+		set(layer[{{plugname}}btn_hide_map_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowMapButtons">
+		if (tour_displaymap,
+			set(layer[{{plugname}}btn_hide_map].visible, true);
+			set(layer[{{plugname}}btn_display_map].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_hide_map_bg].visible, true);
+			set(layer[{{plugname}}btn_display_map_bg].visible, false);{% endif %}
+		,
+			set(layer[{{plugname}}btn_display_map].visible, true);
+			set(layer[{{plugname}}btn_hide_map].visible, false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_display_map_bg].visible, true);
+			set(layer[{{plugname}}btn_hide_map_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateMapButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowMapButtons();
+		,
+			{{plugname}}HideMapButtons();
+		);
+	</action>
+
+{%endif %}
+{% if p.displayfloorplan.enabled %}
+	<events name="{{plugname}}DisplayFloorPlanEvents"
+		onshowtourfloorplan="{{plugname}}updateFloorplanButtons();"
+		onhidetourfloorplan="{{plugname}}updateFloorplanButtons();"
+		keep="true" />
+	<action name="{{plugname}}HideFloorplanButtons">
+		set(layer[{{plugname}}btn_display_floorplan].visible, false);
+		set(layer[{{plugname}}btn_hide_floorplan].visible, false);
+		{% if p.buttonbg.value %}
+		set(layer[{{plugname}}btn_display_floorplan_bg].visible, false);
+		set(layer[{{plugname}}btn_hide_floorplan_bg].visible, false);
+		{% endif %}
+	</action>
+	<action name="{{plugname}}ShowFloorplanButtons">
+		if (tour_displayfloorplan,
+			set(layer[{{plugname}}btn_hide_floorplan].visible, true);
+			set(layer[{{plugname}}btn_display_floorplan].visible, false);
+			{% if p.buttonbg.value %}
+			set(layer[{{plugname}}btn_display_floorplan_bg].visible, false);
+			set(layer[{{plugname}}btn_hide_floorplan_bg].visible, true);
+			{% endif %}
+		,
+			set(layer[{{plugname}}btn_display_floorplan].visible, true);
+			set(layer[{{plugname}}btn_hide_floorplan].visible, false);
+			{% if p.buttonbg.value %}
+			set(layer[{{plugname}}btn_display_floorplan_bg].visible, true);
+			set(layer[{{plugname}}btn_hide_floorplan_bg].visible, false);
+			{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateFloorplanButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowFloorplanButtons();
+		,
+			{{plugname}}HideFloorplanButtons();
+		);
+	</action>
+
+{%endif%}
+
+{% if p.fullscreen.enabled %}
+	<events name="{{plugname}}menufullscreenchangeevent"
+		onenterfullscreen="{{plugname}}updateFullscreenButtons();"
+		onexitfullscreen="{{plugname}}updateFullscreenButtons();"
+		keep="true"/>
+	<action name="{{plugname}}HideFullscreenButtons">
+		set(layer[{{plugname}}btn_openfs].visible , false);
+		set(layer[{{plugname}}btn_closefs].visible, false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_openfs_bg].visible, false);
+		set(layer[{{plugname}}btn_closefs_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowFullscreenButtons">
+		if (device.fullscreensupport,
+			if(tour_fullscreen,
+				set(layer[{{plugname}}btn_openfs].visible , false);
+				set(layer[{{plugname}}btn_closefs].visible, true);
+				{% if p.buttonbg.value %}set(layer[{{plugname}}btn_openfs_bg].visible, false);
+				set(layer[{{plugname}}btn_closefs_bg].visible, true);{% endif %}
+			,
+				set(layer[{{plugname}}btn_openfs].visible ,true);
+				set(layer[{{plugname}}btn_closefs].visible,false);
+				{% if p.buttonbg.value %}set(layer[{{plugname}}btn_openfs_bg].visible, true);
+				set(layer[{{plugname}}btn_closefs_bg].visible, false);{% endif %}
+			);
+		,
+			{{plugname}}HideFullscreenButtons();
+		);
+	</action>
+	<action name="{{plugname}}updateFullscreenButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowFullscreenButtons();
+		,
+			{{plugname}}HideFullscreenButtons();
+		);
+	</action>
+
+{% endif %}
+{% if p.autorotation.enabled %}
+	<events name="{{plugname}}AutorotationEvents"
+		onstartautorotation="{{plugname}}updateAutorotationButtons();"
+		onresumeautorotation="{{plugname}}updateAutorotationButtons();"
+		onstopautorotation="{{plugname}}updateAutorotationButtons();"
+		onpauseautorotation="{{plugname}}updateAutorotationButtons();"
+		keep="true"/>
+	<action name="{{plugname}}HideAutorotationButtons">
+		set(layer[{{plugname}}btn_autorotate_off].visible, false);
+		set(layer[{{plugname}}btn_autorotate_on].visible , false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_autorotate_off_bg].visible, false);
+		set(layer[{{plugname}}btn_autorotate_on_bg].visible , false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowAutorotationButtons">
+		if(autorotate.enabled == false,
+			set(layer[{{plugname}}btn_autorotate_off].visible, false);
+			set(layer[{{plugname}}btn_autorotate_on].visible , true);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_autorotate_off_bg].visible, false);
+			set(layer[{{plugname}}btn_autorotate_on_bg].visible , true);{% endif %}
+		,
+			set(layer[{{plugname}}btn_autorotate_off].visible, true);
+			set(layer[{{plugname}}btn_autorotate_on].visible , false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_autorotate_off_bg].visible, true);
+			set(layer[{{plugname}}btn_autorotate_on_bg].visible , false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateAutorotationButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowAutorotationButtons();
+		,
+			{{plugname}}HideAutorotationButtons();
+		);
+	</action>
+
+{%endif %}
+
+{% if p.autotour.enabled %}
+	<events name="{{plugname}}AutotourEvents"
+		onstartautotour="{{plugname}}updateAutotourButtons();"
+		onstopautotour="{{plugname}}updateAutotourButtons();"
+		keep="true"/>
+	<action name="{{plugname}}HideAutotourButtons">
+		set(layer[{{plugname}}btn_autotour_off].visible, false);
+		set(layer[{{plugname}}btn_autotour_on].visible , false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_autotour_off_bg].visible, false);
+		set(layer[{{plugname}}btn_autotour_on_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowAutotourButtons">
+		if (tour_autotourenabled == false,
+			set(layer[{{plugname}}btn_autotour_off].visible, false);
+			set(layer[{{plugname}}btn_autotour_on].visible , true);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_autotour_off_bg].visible, false);
+			set(layer[{{plugname}}btn_autotour_on_bg].visible, true);{% endif %}
+		,
+			set(layer[{{plugname}}btn_autotour_off].visible, true);
+			set(layer[{{plugname}}btn_autotour_on].visible , false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_autotour_off_bg].visible, true);
+			set(layer[{{plugname}}btn_autotour_on_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateAutotourButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowAutotourButtons();
+		,
+			{{plugname}}HideAutotourButtons();
+		);
+	</action>
+
+{%endif %}
+{% if p.sounds.enabled %}
+	<events name="{{plugname}}playstopsoundsevent" playtoursoundsevent="{{plugname}}updateSoundButtons();" stoptoursoundsevent="{{plugname}}updateSoundButtons();" keep="true"/>
+	<action name="{{plugname}}HideSoundButtons">
+		set(layer[{{plugname}}btn_sound_off].visible, false);
+		set(layer[{{plugname}}btn_sound_on].visible , false);
+		{% if p.buttonbg.value %}set(layer[{{plugname}}btn_sound_off_bg].visible, false);
+		set(layer[{{plugname}}btn_sound_on_bg].visible, false);{% endif %}
+	</action>
+	<action name="{{plugname}}ShowSoundButtons">
+		if (tour_soundson == false,
+			set(layer[{{plugname}}btn_sound_off].visible, false);
+			set(layer[{{plugname}}btn_sound_on].visible , true);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_sound_off_bg].visible, false);
+			set(layer[{{plugname}}btn_sound_on_bg].visible, true);{% endif %}
+		,
+			set(layer[{{plugname}}btn_sound_off].visible, true);
+			set(layer[{{plugname}}btn_sound_on].visible , false);
+			{% if p.buttonbg.value %}set(layer[{{plugname}}btn_sound_off_bg].visible, true);
+			set(layer[{{plugname}}btn_sound_on_bg].visible, false);{% endif %}
+		);
+	</action>
+	<action name="{{plugname}}updateSoundButtons">
+		{% if p.hideonhidecontrols.value %}
+		if (tour_displaycontrols,
+		{% else %}
+		if ({{plugname}}IsOpened,
+		{%endif%}
+			{{plugname}}ShowSoundButtons();
+		,
+			{{plugname}}HideSoundButtons();
+		);
+	</action>
+
+{%endif%}
+
+{% if p.tooltips.value %}
+{% ifequal custom_tooltip_style "true" %}
+	<layer name="{{plugname}}menuTooltipStyle"
+	keep="true"
+	enabled="false"
+	capture="false"
+	type="text"
+	align="center"
+{% ifequal p.skin 'white' %}
+	bg="true"
+	bgcolor="0xFFFFFF"
+	bgalpha="1"
+{% else %}
+{% ifequal p.skin 'black' %}
+	bg="true"
+	bgcolor="0x5b5b5b"
+	bgalpha="1"
+{% else %}
+{% if p.custom_tooltips_style.value.displayBackground %}
+	bg="true"
+	bgcolor="0x{{p.custom_tooltips_style.value.bgColor}}"
+	bgalpha="{{p.custom_tooltips_style.value.bgAlpha}}"
+{%else%}
+	bg="false"
+{% endif %}
+{% endifequal %}
+{% endifequal %}
+{% if p.custom_tooltips_style.value.roundEdge %}
+  bgroundedge="{{p.custom_tooltips_style.value.roundEdge}}"
+{% endif %}
+{% ifequal p.skin 'white' %}
+	bgborder="2.0 0xFFFFFF 1.0"
+  mergedalpha="false"
+{% else %}
+{% ifequal p.skin 'black' %}
+	bgborder="2.0 0x5b5b5b 1.0"
+  mergedalpha="false"
+{% else %}
+{% if p.custom_tooltips_style.value.borderWidth %}
+	bgborder="{{p.custom_tooltips_style.value.borderWidth}}.0 0x{{p.custom_tooltips_style.value.borderColor}} {{p.custom_tooltips_style.value.borderAlpha}}"
+  mergedalpha="false"
+{% else %}
+	bgborder="0"
+{% endif %}
+{% endifequal %}
+{% endifequal %}
+{% if p.custom_tooltips_style.value.shadowed %}
+{% if p.custom_tooltips_style.value.borderWidth %}
+	bgshadow="1.0 1.0 4.0 0x{{p.custom_tooltips_style.value.shadowColor}} {{p.custom_tooltips_style.value.shadowAlpha}}"
+{% else %}
+{% if p.custom_tooltips_style.value.displayBackground %}
+	bgshadow="1.0 1.0 4.0 0x{{p.custom_tooltips_style.value.shadowColor}} {{p.custom_tooltips_style.value.shadowAlpha}}"
+{% endif %}
+{% endif %}
+	txtshadow="1.0 1.0 4.0 0x{{p.custom_tooltips_style.value.shadowColor}} {{p.custom_tooltips_style.value.shadowAlpha}}"
+{% endif %}
+	css="color:#{{p.custom_tooltips_style.value.fgColor}};font-family:{{p.custom_tooltips_style.value.fontFamily}};{% if p.custom_tooltips_style.value.fontItalic %}font-style:italic;{% endif %}{% if p.custom_tooltips_style.value.fontBold %}font-weight:bold;{% endif %}{% if p.custom_tooltips_style.value.fontUnderline %}text-decoration:underline;{% else %}{% if p.custom_tooltips_style.value.fontStrikeout %}text-decoration:line-through;{% endif %}{% endif %}font-size:{{p.custom_tooltips_style.value.fontSize}}px;text-align:left;"
+	edge="bottom"
+	interactivecontent="false"
+	zorder="0"
+	padding="2"
+	xoffset="0"
+	yoffset="0"
+	visible="false"
+	html=""
+	/>
+{% endifequal %}
+{% endif %}
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
+{% endwith %}
+{% endwith %}
+{% endwith %}

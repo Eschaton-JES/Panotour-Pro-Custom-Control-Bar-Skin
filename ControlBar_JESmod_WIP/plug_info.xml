@@ -1,0 +1,251 @@
+<plugin id="JES_Control_Bar_2" category="tr:Control Bar" name="tr:JES Control Bar 2" description="tr:Full screen control bar" version="1.0" isGraphical="true" multipleInstance="false">
+  <parameters>
+    <group id="display" name="tr:Display">
+      <color id="color" name="tr:Foreground color" default="#000000" needAlpha="true" defaultAlpha="1.0" />
+      <color id="bgcolor" name="tr:Background color" default="#3851a3" needAlpha="true" defaultAlpha="1.0" />
+      <bool id="tooltips" name="tr:Show tooltips" default="false"/>
+      <bool id="buttonbg" name="tr:Display button background" default="false"/>
+      <bool id="highlighton" name="tr:Highlight active buttons" default="true"/>
+    </group>
+
+    <features id="controls" name="tr:Available controls">
+
+      <feature id="videoplaypause" name="tr:Play/Pause a panoramic video" enabled="false" guiIcon="btn_start_videoplayer.png" crop="0|48|48|48">
+        <string id="playVideoTip" name="tr:Play video tooltip" default="tr:Play" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="pauseVideoTip" name="tr:Pause video tooltip" default="tr:Pause" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+
+      <feature id="prevnext" name="tr:Previous/Next panorama" enabled="false" guiIcon="btn_next_scene.png" crop="0|48|48|48">
+        <string id="prevSceneTip" name="tr:Previous panorama tooltip"  default="tr:Previous panorama"  conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="nextSceneTip" name="tr:Next panorama tooltip"      default="tr:Next panorama"      conditionalParam="tooltips" conditionalValues="true"/>
+        <select id="prevNextAction" name="tr:Action triggered" default="pano">
+          <item value="pano" name="tr:Go to previous or next panorama"/>
+          <item value="group" name="tr:Go to previous or next group"/>
+        </select>
+      </feature>
+      <feature id="zoom" name="tr:Zoom" enabled="true" guiIcon="btn_zoom_in.png" crop="0|48|48|48">
+        <string id="zoomInTip"  name="tr:Zoom in tooltip"  default="tr:Zoom in"  conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="zoomOutTip" name="tr:Zoom out tooltip" default="tr:Zoom out" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+      <feature id="horizontalnavigation" name="tr:Move horizontally" enabled="true" guiIcon="btn_move_left.png" crop="0|48|48|48">
+        <string id="moveLeftTip"  name="tr:Move left tooltip"  default="tr:Move left"  conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="moveRightTip" name="tr:Move right tooltip" default="tr:Move right" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+      <feature id="verticalnavigation" name="tr:Move vertically" enabled="true" guiIcon="btn_move_up.png" crop="0|48|48|48">
+        <string id="moveUpTip"   name="tr:Move up tooltip"   default="tr:Move up"   conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="moveDownTip" name="tr:Move down tooltip" default="tr:Move down" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+      <feature id="home" name="tr:Home" enabled="false" guiIcon="btn_home.png" crop="0|48|48|48">
+        <string id="homeTip"    name="tr:Home tooltip"   default="tr:Home"   conditionalParam="tooltips" conditionalValues="true"/>
+        <select id="homeAction" name="tr:Back to" description="tr:Where does the home button go back" default="currentpanoview">
+          <item value="currentpanoview" name="tr:Default view of current scene"/>
+          <item value="firstscene"      name="tr:First scene of the tour"/>
+          <item value="startscene"      name="tr:Start scene of the tour"/>
+          <item value="webpage"         name="tr:Specific webpage"/>
+        </select>
+        <label id="firstscenedescription" name="tr:The scene described as the first one in the project." conditionalParam="homeAction" conditionalValues="firstscene"/>
+        <label id="startscenedescription" name="tr:The scene the user saw first. It can be different of the first scene, if the user used a deep link to enter the tour." conditionalParam="homeAction" conditionalValues="startscene"/>
+        <string id="webpageurl" name="tr:Webpage URL" type="url" conditionalParam="homeAction" conditionalValues="webpage"/>
+      </feature>
+      <feature id="fullscreen" name="tr:Fullscreen" enabled="true" guiIcon="btn_enter_fs.png" crop="0|48|48|48">
+        <string id="openFsTip"  name="tr:Enter fullscreen tooltip" default="tr:Enter fullscreen" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="closeFsTip" name="tr:Exit fullscreen tooltip"  default="tr:Exit fullscreen"  conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+      <feature id="autorotation" name="tr:Start/stop autorotation" enabled="true" guiIcon="btn_start_autorotation.png" crop="0|48|48|48">
+        <string id="autorotateOnTip"  name="tr:Start autorotation tooltip" default="tr:Start autorotation" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="autorotateOffTip" name="tr:Stop autorotation tooltip"  default="tr:Stop autorotation"  conditionalParam="tooltips" conditionalValues="true"/>
+        <bool id="useAutorotationDelay" name="tr:On start autorotation action use the rotation delay of the panorama" default="false"/>
+      </feature>
+
+      <feature id="autotour" name="tr:Start/stop automatic tour" enabled="false" guiIcon="btn_start_automatic_tour.png" crop="0|48|48|48">
+        <string id="autotourOnTip"  name="tr:Start automatic tour tooltip" default="tr:Start automatic tour" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="autotourOffTip" name="tr:Stop automatic tour tooltip"  default="tr:Stop automatic tour"  conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+      <feature id="sounds" name="tr:Start/stop sounds" enabled="false" guiIcon="btn_stop_sound.png" crop="0|48|48|48">
+        <string id="soundsOnTip"  name="tr:Start sounds tooltip" default="tr:Start sounds" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="soundsOffTip" name="tr:Stop sounds tooltip"  default="tr:Stop sounds"  conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+
+      <feature id="hidespots" name="tr:Show/hide hotspots" enabled="false" guiIcon="btn_hide_show_hotspots.png" crop="0|48|48|48">
+        <string id="showSpotsTip" name="tr:Show hotspots tooltip" default="tr:Show hotspots" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="hideSpotsTip" name="tr:Hide hotspots tooltip" default="tr:Hide hotspots" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+
+      <feature id="gyro" name="tr:Enable/disable gyroscope" enabled="false" guiIcon="btn_gyroscope.png" crop="0|48|48|48">
+        <string id="gyroOnTip"  name="tr:Enable gyroscope tooltip"  default="tr:Enable gyroscope"  conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="gyroOffTip" name="tr:Disable gyroscope tooltip" default="tr:Disable gyroscope" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="gyroNotTip" name="tr:Unavailable gyroscope tooltip" default="tr:Gyroscope is unavailable" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+      <feature id="displayfloorplan" name="tr:Show/hide floorplan" enabled="false" guiIcon="btn_floorplan.png" crop="0|48|48|48">
+        <string id="displayFloorplanTip" name="tr:Show floorplan tooltip" default="tr:Show floorplan" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="hideFloorplanTip"    name="tr:Hide floorplan tooltip"    default="tr:Hide floorplan"    conditionalParam="tooltips" conditionalValues="true"/>
+		<label id="floorplanTipMessage" type="tip" name="tr:The show/hide floorplan button dispatch a show/hide floorplan request. This button will work only if you have a floorplan plugin that will respond to this request." />
+      </feature>
+      <feature id="displaymap" name="tr:Show/hide map" enabled="false" guiIcon="btn_map.png" crop="0|48|48|48">
+        <string id="displayMapTip" name="tr:Show map tooltip" default="tr:Show map" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="hideMapTip"    name="tr:Hide map tooltip"    default="tr:Hide map"    conditionalParam="tooltips" conditionalValues="true"/>
+		<label id="mapTipMessage" type="tip" name="tr:The show/hide map button dispatch a show/hide map request. This button will work only if you have a map plugin that will respond to this request." />
+      </feature>
+      <feature id="share" name="tr:Share the tour" enabled="false" guiIcon="btn_share.png" crop="0|48|48|48">
+        <string id="shareTip" name="tr:Share tooltip" default="tr:Share the tour" conditionalParam="tooltips" conditionalValues="true"/>
+		<label id="shareTipMessage" type="tip" name="tr:The share tour button dispatch a share tour request. To have a share box on screen you have to add a plugin like the Social Share plugin that will respond to this request." />
+      </feature>
+
+      <feature id="displayhelp" name="tr:Show/hide help screen" enabled="false" guiIcon="btn_help.png" crop="0|48|48|48">
+        <string      id="displayHelpTip" name="tr:Show help screen tooltip" default="tr:Show help screen" conditionalParam="tooltips" conditionalValues="true"/>
+        <string      id="hideHelpTip"    name="tr:Hide help screen tooltip"    default="tr:Hide help screen"    conditionalParam="tooltips" conditionalValues="true"/>
+        <bool        id="useThemeHelpScreen" name="tr:Use the default theme help screen foreground" default="true"/>
+        <filechooser id="helpscreenfg" name="tr:Help screen foreground" default="" filters="images" allowRemote="true" conditionalParam="useThemeHelpScreen" conditionalValues="false"/>
+      </feature>
+
+      <feature id="displayinfo" name="tr:Show/hide information " enabled="false" guiIcon="btn_info.png" crop="0|48|48|48">
+        <string id="displayInfoTip" name="tr:Show information tooltip" default="tr:Show information" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="hideInfoTip"    name="tr:Hide information tooltip"    default="tr:Hide information"    conditionalParam="tooltips" conditionalValues="true"/>
+		<label id="infoTipMessage" type="tip" name="tr:The show/hide information dispatch a show/hide information request. This button will work only if you have a plugin like Description that will respond to this request." />
+      </feature>
+      <feature id="enterVR" name="tr:Enter VR mode" enabled="false" guiIcon="btn_vr_mode.png" crop="0|48|48|48">
+        <bool id="mobile_only" name="tr:Available only on mobile device" default="false"/>
+        <string id="enterVRTip" name="tr:Enter VR mode tooltip" default="tr:VR mode" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="enterVRNotTip" name="tr:Unavailable VR mode tooltip" default="tr:VR mode is unavailable" conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+
+      <feature id="hidecontrols" name="tr:Show/hide controls " enabled="true" guiIcon="btn_hide_controls.png" crop="0|48|48|48">
+        <string id="displayControlsTip" name="tr:Show controls tooltip" default="tr:Show controls" conditionalParam="tooltips" conditionalValues="true"/>
+        <string id="hideControlsTip"    name="tr:Hide controls tooltip"    default="tr:Hide controls"    conditionalParam="tooltips" conditionalValues="true"/>
+      </feature>
+
+    </features>
+
+    <group id="tooltip_group" name="tr:Tooltips style" conditionalParam="tooltips" conditionalValues="true">
+      <bool  id="custom_tooltips" name="tr:Use custom tooltips style" default="true" />
+      <tooltipstyle id="custom_tooltips_style" name="tr:Custom tooltips style" fontfamily="Times New Roman" borderwidth="0" roundedge="0" displayBackground="true" fontsize="14" shadowed="false" fontstyle="bold" conditionalParam="custom_tooltips" conditionalValues="true">
+        <foregroundColor alpha="1" source="customColor" color="#f29320"/>
+        <backgroundColor alpha="0.8" source="customColor" color="#92d26a"/>
+        <borderColor alpha="1" source="customColor" color="#f29320"/>
+        <shadowColor alpha="1" source="customColor" color="#000000"/>
+      </tooltipstyle>
+    </group>
+
+    <group id="behaviors" name="tr:Behavior">
+      <bool id="hideonhidecontrols" name="tr:Respond to show/hide controls request" default="false" description="tr:Show/hide this component when the user triggers a show/hide controls request from an other component" />
+
+      <bool id="hide_on_video_playback" name="tr:Hide the control bar on panoramic video display" default="false" />
+
+    </group>
+
+  </parameters>
+
+  <resources>
+    <file url="btn_move_left.png"            color="color" baseColor="#f29320" conditionalParam="horizontalnavigation" conditionalValues="true"/>
+    <file url="btn_move_right.png"           color="color" baseColor="#f29320" conditionalParam="horizontalnavigation" conditionalValues="true"/>
+    <file url="btn_move_down.png"            color="color" baseColor="#f29320" conditionalParam="verticalnavigation"   conditionalValues="true"/>
+    <file url="btn_move_up.png"              color="color" baseColor="#f29320" conditionalParam="verticalnavigation"   conditionalValues="true"/>
+    <file url="btn_home.png"                 color="color" baseColor="#f29320" conditionalParam="home"                 conditionalValues="true"/>
+    <file url="btn_close_fs.png"             color="color" baseColor="#2b2b2b" conditionalParam="fullscreen"           conditionalValues="true"/>
+    <file url="btn_enter_fs.png"             color="color" baseColor="#f29320" conditionalParam="fullscreen"           conditionalValues="true"/>
+
+    <file url="btn_move_to.png"              color="color" baseColor="#f29320" conditionalParam="mousecontrol"         conditionalValues="true"/>
+    <file url="btn_help.png"                 color="color" baseColor="#f29320" conditionalParam="displayhelp"          conditionalValues="true"/>
+    <file url="help_screen_bg.png"           color="bgcolor" baseColor="#92d26a" conditionalParam="displayhelp"          conditionalValues="true"/>
+    <file url="help_screen_fg.png"           color="color"   baseColor="#f29320" conditionalParam="displayhelp"          conditionalValues="true"/>
+    <file url="btn_hide_controls.png"        color="color"   baseColor="#f29320" conditionalParam="hidecontrols"         conditionalValues="true"/>
+    <file url="btn_show_controls.png"        color="color"   baseColor="#f29320" conditionalParam="hidecontrols"         conditionalValues="true"/>
+    <file url="btn_show_controls_bg.png"     color="bgcolor" baseColor="#92d26a" conditionalParam="hidecontrols"         conditionalValues="true"/>
+    <file url="btn_hide_show_hotspots.png"   color="color" baseColor="#f29320" conditionalParam="hidespots"            conditionalValues="true"/>
+    <file url="btn_hide_thumbnails.png"      color="color" baseColor="#f29320" conditionalParam="hidethumbnails"       conditionalValues="true"/>
+    <file url="btn_show_thumbnails.png"      color="color" baseColor="#f29320" conditionalParam="hidethumbnails"       conditionalValues="true"/>
+    <file url="btn_next_scene.png"           color="color" baseColor="#f29320" conditionalParam="prevnext"             conditionalValues="true"/>
+    <file url="btn_previous_scene.png"       color="color" baseColor="#f29320" conditionalParam="prevnext"             conditionalValues="true"/>
+    <file url="btn_start_autorotation.png"   color="color" baseColor="#f29320" conditionalParam="autorotation"         conditionalValues="true"/>
+    <file url="btn_stop_autorotation.png"    color="color" baseColor="#f29320" conditionalParam="autorotation"         conditionalValues="true"/>
+    <file url="btn_zoom_in.png"              color="color" baseColor="#f29320" conditionalParam="zoom"                 conditionalValues="true"/>
+    <file url="btn_zoom_out.png"             color="color" baseColor="#f29320" conditionalParam="zoom"                 conditionalValues="true"/>
+
+    <file url="btn_gyroscope.png"            color="color" baseColor="#f29320" conditionalParam="gyro"                 conditionalValues="true" tourTypes="html5"/>
+    <file url="btn_gyroscope_off.png"                                          conditionalParam="gyro"                 conditionalValues="true" tourTypes="html5"/>
+    <file url="btn_floorplan.png"            color="color" baseColor="#f29320" conditionalParam="displayfloorplan"     conditionalValues="true"/>
+    <file url="btn_map.png"                  color="color" baseColor="#f29320" conditionalParam="displaymap"           conditionalValues="true"/>
+    <file url="btn_info.png"                 color="color" baseColor="#f29320" conditionalParam="displayinfo"          conditionalValues="true"/>
+    <file url="btn_start_automatic_tour.png" color="color" baseColor="#f29320" conditionalParam="autotour"             conditionalValues="true"/>
+    <file url="btn_stop_automatic_tour.png"  color="color" baseColor="#f29320" conditionalParam="autotour"             conditionalValues="true"/>
+    <file url="btn_start_sound.png"          color="color" baseColor="#f29320" conditionalParam="sounds"               conditionalValues="true"/>
+    <file url="btn_stop_sound.png"           color="color" baseColor="#f29320" conditionalParam="sounds"               conditionalValues="true"/>
+    <file url="btn_share.png"                color="color" baseColor="#f29320" conditionalParam="share"                conditionalValues="true"/>
+    <file url="btn_start_videoplayer.png"    color="color" baseColor="#f29320" conditionalParam="videoplaypause"       conditionalValues="true"/>
+    <file url="btn_pause_videoplayer.png"    color="color" baseColor="#f29320" conditionalParam="videoplaypause"       conditionalValues="true"/>
+    <file url="btn_vr_mode.png"              color="color" baseColor="#f29320" conditionalParam="enterVR"              conditionalValues="true" tourTypes="html5"/>
+    <file url="btn_vr_mode_off.png"                                            conditionalParam="enterVR"              conditionalValues="true" tourTypes="html5"/>
+    <file url="btn_close_window.png"   color="bgcolor" baseColor="#92d26a"/>
+    <file url="header.png"             color="bgcolor" baseColor="#92d26a"/>
+    <file url="background2.png"         color="bgcolor" baseColor="#92d26a"/>
+    <file url="frame_bg2.png"           color="bgcolor" baseColor="#92d26a"/>
+
+    <file url="thumbnails_states.png"   color="color"   baseColor="#f29320" conditionalParam="displaythumbnails" conditionalValues="true"/>
+    <file url="btn_scroll_left.png"     color="color"   baseColor="#f29320" conditionalParam="displaythumbnails" conditionalValues="true"/>
+    <file url="btn_scroll_left_bg.png"                                      conditionalParam="displaythumbnails" conditionalValues="true"/>
+    <file url="btn_scroll_right.png"    color="color"   baseColor="#f29320" conditionalParam="displaythumbnails" conditionalValues="true"/>
+    <file url="btn_scroll_right_bg.png"                                     conditionalParam="displaythumbnails" conditionalValues="true"/>
+    <file url="btn_bg.png"                                                  conditionalParam="buttonbg" conditionalValues="true"/>
+    <file url="footer.png"             color="bgcolor" baseColor="#92d26a"/>
+  </resources>
+
+  <libraries>
+      <file url="KOLORRES:scrollarea.js"  tourTypes="html5" conditionalParam="displaythumbnails" conditionalValues="true"/>
+      <file url="KOLORRES:scrollarea.swf" tourTypes="flash" conditionalParam="displaythumbnails" conditionalValues="true"/>
+  </libraries>
+
+  <templates>
+      <template url="theme1.tmpl" />
+  </templates>
+
+  <depends>
+    <template url="KOLORRES:moveleftcall.tmpl"             conditionalParam="horizontalnavigation" conditionalValues="true"/>
+    <template url="KOLORRES:moverightcall.tmpl"            conditionalParam="horizontalnavigation" conditionalValues="true"/>
+    <template url="KOLORRES:stopmovehorizontalcall.tmpl"   conditionalParam="horizontalnavigation" conditionalValues="true"/>
+    <template url="KOLORRES:moveupcall.tmpl"               conditionalParam="verticalnavigation"   conditionalValues="true"/>
+    <template url="KOLORRES:movedowncall.tmpl"             conditionalParam="verticalnavigation"   conditionalValues="true"/>
+    <template url="KOLORRES:stopmoveverticalcall.tmpl"     conditionalParam="verticalnavigation"   conditionalValues="true"/>
+    <template url="KOLORRES:zoomincall.tmpl"               conditionalParam="zoom"                 conditionalValues="true"/>
+    <template url="KOLORRES:zoomoutcall.tmpl"              conditionalParam="zoom"                 conditionalValues="true"/>
+    <template url="KOLORRES:stopzoomcall.tmpl"             conditionalParam="zoom"                 conditionalValues="true"/>
+    <template url="KOLORRES:startautorotationcall.tmpl"    conditionalParam="autorotation"         conditionalValues="true"/>
+    <template url="KOLORRES:stopautorotationcall.tmpl"     conditionalParam="autorotation"         conditionalValues="true"/>
+    <template url="KOLORRES:resumeautorotationcall.tmpl"   conditionalParam="autorotation"         conditionalValues="true"/>
+    <template url="KOLORRES:pauseautorotationcall.tmpl"    conditionalParam="autorotation"         conditionalValues="true"/>
+    <template url="KOLORRES:loadnextscenecall.tmpl"        conditionalParam="prevnext"             conditionalValues="true"/>
+    <template url="KOLORRES:loadprevscenecall.tmpl"        conditionalParam="prevnext"             conditionalValues="true"/>
+    <template url="KOLORRES:loadnextgroupcall.tmpl"        conditionalParam="prevNextAction"       conditionalValues="group" />
+    <template url="KOLORRES:loadprevgroupcall.tmpl"        conditionalParam="prevNextAction"       conditionalValues="group" />
+    <template url="KOLORRES:showhotspotscall.tmpl"         conditionalParam="hidespots"            conditionalValues="true"/>
+    <template url="KOLORRES:hidehotspotscall.tmpl"         conditionalParam="hidespots"            conditionalValues="true"/>
+    <template url="KOLORRES:showtourcontrolscall.tmpl"     conditionalParam="hidecontrols"         conditionalValues="true"/>
+    <template url="KOLORRES:hidetourcontrolscall.tmpl"     conditionalParam="hidecontrols"         conditionalValues="true"/>
+    <template url="KOLORRES:showtourcontrolscall.tmpl"     conditionalParam="hideonhidecontrols"   conditionalValues="true"/>
+    <template url="KOLORRES:hidetourcontrolscall.tmpl"     conditionalParam="hideonhidecontrols"   conditionalValues="true"/>
+    <template url="KOLORRES:showtourthumbnailscall.tmpl"   conditionalParam="hidethumbnails"       conditionalValues="true"/>
+    <template url="KOLORRES:hidetourthumbnailscall.tmpl"   conditionalParam="hidethumbnails"       conditionalValues="true"/>
+    <template url="KOLORRES:enterfullscreencall.tmpl"      conditionalParam="fullscreen"           conditionalValues="true"/>
+    <template url="KOLORRES:exitfullscreencall.tmpl"       conditionalParam="fullscreen"           conditionalValues="true"/>
+    <template url="KOLORRES:setcontrolmodemovetocall.tmpl" conditionalParam="mousecontrol"         conditionalValues="true"/>
+    <template url="KOLORRES:setcontrolmodedragtocall.tmpl" conditionalParam="mousecontrol"         conditionalValues="true"/>
+
+    <template url="KOLORRES:videointerfacecall.tmpl"       conditionalParam="videoplaypause"       conditionalValues="true"/>
+    <template url="KOLORRES:startautotourcall.tmpl"        conditionalParam="autotour"             conditionalValues="true"/>
+    <template url="KOLORRES:stopautotourcall.tmpl"         conditionalParam="autotour"             conditionalValues="true"/>
+    <template url="KOLORRES:playtoursoundscall.tmpl"       conditionalParam="sounds"               conditionalValues="true"/>
+    <template url="KOLORRES:stoptoursoundscall.tmpl"       conditionalParam="sounds"               conditionalValues="true"/>
+    <template url="KOLORRES:enablegyroscopecall.tmpl"      conditionalParam="gyro"                 conditionalValues="true"/>
+    <template url="KOLORRES:disablegyroscopecall.tmpl"     conditionalParam="gyro"                 conditionalValues="true"/>
+    <template url="KOLORRES:showmapcall.tmpl"              conditionalParam="displaymap"           conditionalValues="true"/>
+    <template url="KOLORRES:hidemapcall.tmpl"              conditionalParam="displaymap"           conditionalValues="true"/>
+    <template url="KOLORRES:showfloorplancall.tmpl"        conditionalParam="displayfloorplan"     conditionalValues="true"/>
+    <template url="KOLORRES:hidefloorplancall.tmpl"        conditionalParam="displayfloorplan"     conditionalValues="true"/>
+    <template url="KOLORRES:sharetourcall.tmpl"            conditionalParam="share"                conditionalValues="true"/>
+    <template url="KOLORRES:showtourinfocall.tmpl"         conditionalParam="displayinfo"          conditionalValues="true"/>
+    <template url="KOLORRES:hidetourinfocall.tmpl"         conditionalParam="displayinfo"          conditionalValues="true"/>
+    <template url="KOLORRES:webvrcall.tmpl"                conditionalParam="enterVR"              conditionalValues="true"/>
+
+    <template url="KOLORRES:openurlactioncall.tmpl"        conditionalParam="homeAction"           conditionalValues="webpage"/>
+  </depends>
+
+</plugin>
